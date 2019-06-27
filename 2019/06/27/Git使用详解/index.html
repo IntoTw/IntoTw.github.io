@@ -14,9 +14,10 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-CN">
+<html class="theme-next pisces use-motion" lang="zh-CN">
 <head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="UTF-8">
+  
+<meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
@@ -29,7 +30,7 @@
     
     
   <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
-  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css?v=1.0.2">
 
 
 
@@ -75,7 +76,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Pisces',
     version: '7.1.2',
     sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
     back2top: true,
@@ -100,14 +101,18 @@
 
 
 
-
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/categories/搭建博客/index.html">
-<meta property="og:site_name" content="Hexo">
+  <meta name="description" content="之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。 因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。 所以顺带也研究了一下这个问题 下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么 版本号&amp;#160; &amp;#1">
+<meta name="keywords" content="git,Git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git使用详解">
+<meta property="og:url" content="https://github.com/IntoTw/2019/06/27/Git使用详解/index.html">
+<meta property="og:site_name" content="IntoTw">
+<meta property="og:description" content="之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。 因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。 所以顺带也研究了一下这个问题 下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么 版本号&amp;#160; &amp;#1">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-06-27T09:38:39.676Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="Git使用详解">
+<meta name="twitter:description" content="之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。 因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。 所以顺带也研究了一下这个问题 下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么 版本号&amp;#160; &amp;#1">
 
 
 
@@ -115,7 +120,7 @@
 
   
   
-  <link rel="canonical" href="http://yoursite.com/categories/搭建博客/">
+  <link rel="canonical" href="https://github.com/IntoTw/2019/06/27/Git使用详解/">
 
 
 
@@ -125,7 +130,7 @@
   };
 </script>
 
-  <title>分类: 搭建博客 | Hexo</title>
+  <title>Git使用详解 | IntoTw</title>
   
 
 
@@ -173,7 +178,7 @@
     
   
 
-  <div class="container sidebar-position-right ">
+  <div class="container sidebar-position-right page-post-detail">
     <div class="headband"></div>
 	<a href="https://github.com/IntoTw" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -184,7 +189,7 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">IntoTw</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -227,6 +232,38 @@
         
         
           
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
           <li class="menu-item menu-item-archives">
 
     
@@ -237,6 +274,38 @@
     
 
     <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-something">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/随笔" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>随笔</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
 
   </li>
 
@@ -252,22 +321,6 @@
       
     </ul>
   
-
-  
-    
-
-    
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
 
   
 
@@ -311,60 +364,265 @@
       <div class="main-inner">
         <div class="content-wrap">
           
+            
+
+          
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block category">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>搭建博客<small>分类</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/IntoTw/2019/06/27/Git使用详解/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="IntoTw">
+      <meta itemprop="description" content="人生如逆旅，我亦是行人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="IntoTw">
+    </span>
+
+    
+      <header class="post-header">
+
         
-          <a class="post-title-link" href="/2019/06/27/index/" itemprop="url">
-            
-              <span itemprop="name">第一篇</span>
-            
-          </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Git使用详解
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-06-27T14:46:42+08:00" content="2019-06-27">
-          06-27
-        </time>
-      </div>
+              
+            
+          </h1>
+        
 
-    </header>
-  </article>
+        <div class="post-meta">
+          <span class="post-time">
 
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-27 17:13:00 / 修改时间：17:38:39" itemprop="dateCreated datePublished" datetime="2019-06-27T17:13:00+08:00">2019-06-27</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。</p>
+<p>因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。</p>
+<p>所以顺带也研究了一下这个问题</p>
+<p>下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么</p>
+<h2 id="版本号"><a href="#版本号" class="headerlink" title="版本号"></a>版本号</h2><p>&#160; &#160; &#160; &#160;Git本身有版本号的概念，版本号基于每次<strong>commit</strong>，查看最近的<strong>commit</strong>可以使用<strong>git log</strong>查看，查看所有历史版本可以使用<strong>git reflog</strong>查看所有本地commit的版本号，使用这两个命令可以查看到commit过的记录和commit时填写的信息，但是命令行内查看好像暂时不支持中文的commit信息显示。</p>
+<h2 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h2><p>Git有2个仓库概念，一个是远端仓库，一个是本地仓库。在本地和远端之间同步的时候一定要谨慎</p>
+<h2 id="本地仓库"><a href="#本地仓库" class="headerlink" title="本地仓库"></a>本地仓库</h2><p>&#160; &#160; &#160; &#160;实际上，在不使用<strong>fetch，pull，push，merge</strong>这几个命令的情况下，Git是仅使用本地仓库就可以完成版本管理的，主要的命令（或者说是操作）涉及到<strong>add，commit</strong>。</p>
+<p><strong>add操作</strong>用于将目录下的文件添加到Git的工作空间里去，同目录下未使用add命令添加过的文件，是不参与到git版本管理中去的，也就是说是独立于Git的。</p>
+<p><strong>commit操作</strong>用于提交修改，仅限于本地，用于提交每次修改，commit会产生一个commit id，这个id标识这次commit，在本地的话，实际上版本管理就是不断基于commit做的版本管理，假设commit过3次内容为A,B,C。C为最后commit的版本，此时想回退，只需要git reset commitid –hard 命令，就能把本地仓库回退到B或A的那次commit。</p>
+<p><strong>revert</strong>用于在某次commit之后，假设commit id为A，此时做了一系列修改，但未commit，此时revert会将所有修改取消，回归到commit id为A时的状态。</p>
+<h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>&#160; &#160; &#160; &#160;实际上，远程仓库仅仅可以看做是一个代码的备份，是一个公共的备份，也就是说，在每次<strong>push</strong>后，<strong>你的本地仓库和远程仓库所有文件应该是一模一样的</strong>，通过push的话，会把本地的所有commit同步到远程仓库上去，也就是说，<strong>远程仓库的commit过程应该是每个人在本地commit的总和，但可能顺序不同。</strong></p>
+<p>&#160; &#160; &#160; &#160;对本地仓库来说，pull就等于同步远端仓库到本地仓库加merge，push就等于把本地仓库同步到远端仓库加merge。</p>
+<p>&#160; &#160; &#160; &#160;Merge的本质，是将两个分支同步，实际上都是在本地merge。说一下这个过程，假设现在远端仓库版本为A，此时小g和小w同时从A上pull到了本地仓库将他们自己的本地仓库同步到了远端的版本A，此时他们的本地仓库我们假设为A1，A2，他们基于A1,A2做了自己的修改，并且同时修改了test.txt，然后都想提交到远端，第一个提交的人肯定可以提交成功，但是第二个提交的人必定会出现push失败，需要merge该文件，此时他在idea中merge了该文件确认自己改的才是对的，然后再push，此时就成功了。</p>
+<p>&#160; &#160; &#160; &#160;解释一下，此时的merge实际过程是他处理了冲突之后，又进行了一次针对merge的commit，此次commit专门用来处理冲突并提交，具体体现在idea里你会发现，有的时候会让你选accept theirs,accept yours，你选了accept yours或者全部按照你本地来作为最终版本的文件，不需要commit，如果你选的是accept theirs或者merge的时候选择了远端的修改，那么你本地需要全部commit一次再提交，也就是说实际处理的merge是在本地确认了merge结果，这次commit和push实际idea是做了特殊处理的，带着merge的头，所以可以不会再次触发冲突，idea直接通过强制-force push到远端。</p>
+<h2 id="Bug修改，Hotfix"><a href="#Bug修改，Hotfix" class="headerlink" title="Bug修改，Hotfix"></a>Bug修改，Hotfix</h2><p>&#160; &#160; &#160; &#160;之前考虑到生产环境修改，紧急bug修复，会基于生产环境分支创建一个hotfix分支，做修改完成后由prod分支合并hotfix分支，然后删除hotfix分支，但是这带来了一个问题，该hotfix分支难以合并到例如dev，test等分支，因为：</p>
+<p>1.配置文件问题，从hotfix分支merge到dev分支，会导致dev等分支配置文件被覆盖，十分麻烦</p>
+<p>2.版本管理问题，如果dev此时分支远远超前prod分支，那么此时将不可能合并hotfix的修改到dev上</p>
+<p>可以通过git的stash功能解决这个问题。</p>
+<p>&#160; &#160; &#160; &#160;stash和他的操作unstash的本质，是创建一个修改副本。他的应用场景和操作模式在于，有的时候本地做了一系列修改，但是忽然又要全部回到修改前的时候进行一下打包，此时要么从新从远端拉一个分支到本地，要么就直接copy一份项目到其他目录，然后这个目录下的revert掉，改完覆盖回来。</p>
+<p>&#160; &#160; &#160; &#160;stash可以轻松解决，stash可以对当前所有的修改（具体提现到所有蓝色的文件）做一个备份，创建一个stash后，项目会自动回到当前commit id的状态（相当于revert），相当于对所有修改做了一个另外的保存，然后可以通过unstash可以把这些修改还原回来。</p>
+<p>&#160; &#160; &#160; &#160;这样的话通过这个功能可以很轻松的解决这个问题，本地check出来hotfix分支之后，修改完毕不要先commit，先进行stash，然后unstash回来，再进行commit，push。完成后回到dev分支进行unstash同样进行一下更改，就把更改应用在dev分支上了。</p>
 
       
     </div>
 
+    
+
+    
+    
+    
+	<div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2019/06/27/Git使用详解/">Git使用详解</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 IntoTw 的个人博客">IntoTw</a></p>
+  <p><span>发布时间:</span>2019年06月27日 - 17:06</p>
+  <p><span>最后更新:</span>2019年06月27日 - 17:06</p>
+  <p><span>原始链接:</span><a href="/2019/06/27/Git使用详解/" title="Git使用详解">https://github.com/IntoTw/2019/06/27/Git使用详解/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://github.com/IntoTw/2019/06/27/Git使用详解/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+      
+	</div>
+    
+
+    
+      
+    
+    
+
+    
+	<div>
+	  
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束感谢您的阅读-------------</div>
+    
+</div>
+
+	  
+	</div>
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/git/" rel="tag"># git</a>
+          
+            <a href="/tags/Git/" rel="tag"># Git</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/27/不继续使用CSDN的原因/" rel="prev" title="不继续使用CSDN的原因">
+                不继续使用CSDN的原因 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -384,13 +642,22 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <p class="site-author-name" itemprop="name">IntoTw</p>
-              <div class="site-description motion-element" itemprop="description"></div>
+              <div class="site-description motion-element" itemprop="description">人生如逆旅，我亦是行人</div>
           </div>
 
           
@@ -400,7 +667,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -419,7 +686,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -442,9 +711,7 @@
                     
                       
                     
-                      
-                    
-                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -486,6 +753,23 @@
       </div>
 
       
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#版本号"><span class="nav-number">1.</span> <span class="nav-text">版本号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#仓库"><span class="nav-number">2.</span> <span class="nav-text">仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地仓库"><span class="nav-number">3.</span> <span class="nav-text">本地仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远程仓库"><span class="nav-number">4.</span> <span class="nav-text">远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bug修改，Hotfix"><span class="nav-number">5.</span> <span class="nav-text">Bug修改，Hotfix</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
 
       
 
@@ -521,7 +805,7 @@
 
 
 
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.2</div>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.2</div>
 
 
 
@@ -531,7 +815,6 @@
   本站访客数:<span id="busuanzi_value_site_uv"></span>
 </span>
 </div>
-</div>
 <div class="powered-by">
 <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
   本站访问量:<span id="busuanzi_value_site_pv"></span>
@@ -539,9 +822,25 @@
 </div>
 <div class="theme-info">
   <div class="powered-by"></div>
-  <span class="post-count">博客全站共77字</span>
+  <span class="post-count">博客全站共1.9k字</span>
 </div>
-
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("06/27/2019 12:00:00");//在此处修改你的建站时间
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = " 网站已运行 "+dnum+" D "; 
+        document.getElementById("times").innerHTML = hnum + " H " + mnum + " M " + snum + " S"; 
+    } 
+setInterval("createtime()",250);
+</script>
         
 
 
@@ -552,12 +851,14 @@
 
 
         
-      </footer></div>
-    
+      </div>
+    </footer>
 
     
       <div class="back-to-top">
         <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
         
       </div>
     
@@ -567,7 +868,7 @@
     
 
     
-  
+  </div>
 
   
 
@@ -589,12 +890,6 @@
 
 
 
-
-  
-    
-    
-  
-  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
 
 
 
@@ -631,11 +926,17 @@
   
 
 
-  <script src="/js/schemes/muse.js?v=7.1.2"></script>
+  <script src="/js/affix.js?v=7.1.2"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.2"></script>
 
 
 
   
+  <script src="/js/scrollspy.js?v=7.1.2"></script>
+<script src="/js/post-details.js?v=7.1.2"></script>
+
+
 
   
 
@@ -651,6 +952,8 @@
 
   
 
+
+  
 
 
   
