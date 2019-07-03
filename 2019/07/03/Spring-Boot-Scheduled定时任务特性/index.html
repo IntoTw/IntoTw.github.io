@@ -101,17 +101,18 @@
 
 
 
-  <meta name="description" content="人生如逆旅，我亦是行人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="分类">
-<meta property="og:url" content="https://github.com/IntoTw/categories/index.html">
+  <meta name="description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
+<meta name="keywords" content="SpringBoot,Scheduled">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot Scheduled定时任务特性">
+<meta property="og:url" content="https://github.com/IntoTw/2019/07/03/Spring-Boot-Scheduled定时任务特性/index.html">
 <meta property="og:site_name" content="IntoTw">
-<meta property="og:description" content="人生如逆旅，我亦是行人">
+<meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-06-27T08:50:34.476Z">
+<meta property="og:updated_time" content="2019-07-03T01:52:45.854Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分类">
-<meta name="twitter:description" content="人生如逆旅，我亦是行人">
+<meta name="twitter:title" content="Spring Boot Scheduled定时任务特性">
+<meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
 
 
 
@@ -119,7 +120,7 @@
 
   
   
-  <link rel="canonical" href="https://github.com/IntoTw/categories/">
+  <link rel="canonical" href="https://github.com/IntoTw/2019/07/03/Spring-Boot-Scheduled定时任务特性/">
 
 
 
@@ -129,7 +130,7 @@
   };
 </script>
 
-  <title>分类 | IntoTw</title>
+  <title>Spring Boot Scheduled定时任务特性 | IntoTw</title>
   
 
 
@@ -231,7 +232,7 @@
         
         
           
-          <li class="menu-item menu-item-categories menu-item-active">
+          <li class="menu-item menu-item-categories">
 
     
     
@@ -365,97 +366,253 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/IntoTw/2019/07/03/Spring-Boot-Scheduled定时任务特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="IntoTw">
+      <meta itemprop="description" content="人生如逆旅，我亦是行人">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="IntoTw">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-<h1 class="post-title" itemprop="name headline">分类
-
-</h1>
-
-<div class="post-meta">
-  
-  
-
-
-
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="category-all-page">
-            <div class="category-all-title">
+          <h1 class="post-title" itemprop="name headline">Spring Boot Scheduled定时任务特性
+
               
-              
-                
-                  
-                
-              
-                
-                  
-                
-              
-                
-                  
-                
-              
-              目前共计 3 个分类
-            </div>
-            <div class="category-all">
-              <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Git/">Git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a><span class="category-list-count">1</span></li></ul>
-            </div>
-          </div>
+            
+          </h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-03 09:32:06 / 修改时间：09:52:45" itemprop="dateCreated datePublished" datetime="2019-07-03T09:32:06+08:00">2019-07-03</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/SpringBoot/" itemprop="url" rel="index"><span itemprop="name">SpringBoot</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>&#160; &#160; &#160; &#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务</p>
+<p>&#160; &#160; &#160; &#160;下面说说使用时要注意的Scheduled的几个特性</p>
+<pre><code>Scheduled的执行方式 </code></pre><p>&#160; &#160; &#160; &#160;Scheduled按照顺序执行，对于某个task未做配置的话只会起一个线程去执行，也就是说当你某个任务在处理中阻塞了，哪怕轮询时间再次到达，Spring也不会再起线程执行该任务，而是会等待上次任务执行完毕，所以请不要在Scheduled的task中做一些比较需要频繁触发的易失败，易阻塞，易超时操作，避免任务无法正常轮询执行</p>
+<pre><code>Scheduled中的线程池 </code></pre><p>&#160; &#160; &#160; &#160;Scheduled执行可以通过Spring Boot提供的配置来配置定时任务执行的线程池等信息，如果未做配置的话，根据我测试，所有定时任务仅有一个线程去执行，也就是说如果某个task阻塞，其他task都将得不到执行。具体配置方法如下</p>
+<pre><code>@Configuration
+@EnableScheduling
+public class SchedulerTaskConfiguration implements SchedulingConfigurer {
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
+        scheduledTaskRegistrar.setScheduler(taskExecutor());
+    }
+
+    @Bean
+    public Executor taskExecutor() {
+        //线程池大小
+        return Executors.newScheduledThreadPool(10);
+    }
+}</code></pre><p>&#160; &#160; &#160; &#160;但是哪怕是配置了线程池，也只是降低了多个task之间执行的影响，对于单个task来说，哪怕配置了线程池，依旧会因为上次执行的阻塞影响到下一次触发</p>
+<pre><code>Scheduled的执行频率</code></pre><p>&#160; &#160; &#160; &#160;Scheduled的执行频率可以由2种方式控制，一种为在@Scheduled中添加fixedRate属性，即@Scheduled(fixedRate = 10)，数字为执行的间隔毫秒，也就是多少毫秒执行一次</p>
+<p>&#160; &#160; &#160; &#160;另一种为添加cron属性，属性值为cron表达式，可以通过cron表达式指定为具体某年某月某分某秒，也可以通过cron表达式指定为间隔几小时或几分钟执行一次,如<strong>@Scheduled(cron = “0 0 1 * * *”)</strong></p>
+
       
     </div>
-    
-
-
 
     
+
     
     
+    
+	<div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/">Spring Boot Scheduled定时任务特性</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 IntoTw 的个人博客">IntoTw</a></p>
+  <p><span>发布时间:</span>2019年07月03日 - 09:07</p>
+  <p><span>最后更新:</span>2019年07月03日 - 09:07</p>
+  <p><span>原始链接:</span><a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/" title="Spring Boot Scheduled定时任务特性">https://intotw.github.io/2019/07/03/Spring-Boot-Scheduled定时任务特性/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://intotw.github.io/2019/07/03/Spring-Boot-Scheduled定时任务特性/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
+      
+	</div>
+    
+
+    
+      
+    
+    
+
+    
+	<div>
+	  
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束感谢您的阅读-------------</div>
+    
+</div>
+
+	  
+	</div>
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+          
+            <a href="/tags/Scheduled/" rel="tag"># Scheduled</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/27/不继续使用CSDN的原因/" rel="next" title="不继续使用CSDN的原因">
+                <i class="fa fa-chevron-left"></i> 不继续使用CSDN的原因
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
   </div>
 
 
