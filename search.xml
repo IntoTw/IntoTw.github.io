@@ -1,38 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title><![CDATA[Spring Boot Scheduled定时任务特性]]></title>
-    <url>%2F2019%2F07%2F03%2FSpring-Boot-Scheduled%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%89%B9%E6%80%A7%2F</url>
-    <content type="text"><![CDATA[&#160; &#160; &#160; &#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &#160; &#160; &#160; &#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式&#160; &#160; &#160; &#160;Scheduled按照顺序执行，对于某个task未做配置的话只会起一个线程去执行，也就是说当你某个任务在处理中阻塞了，哪怕轮询时间再次到达，Spring也不会再起线程执行该任务，而是会等待上次任务执行完毕，所以请不要在Scheduled的task中做一些比较需要频繁触发的易失败，易阻塞，易超时操作，避免任务无法正常轮询执行 Scheduled中的线程池&#160; &#160; &#160; &#160;Scheduled执行可以通过Spring Boot提供的配置来配置定时任务执行的线程池等信息，如果未做配置的话，根据我测试，所有定时任务仅有一个线程去执行，也就是说如果某个task阻塞，其他task都将得不到执行。具体配置方法如下 @Configuration @EnableScheduling public class SchedulerTaskConfiguration implements SchedulingConfigurer { @Override public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) { scheduledTaskRegistrar.setScheduler(taskExecutor()); } @Bean public Executor taskExecutor() { //线程池大小 return Executors.newScheduledThreadPool(10); } }&#160; &#160; &#160; &#160;但是哪怕是配置了线程池，也只是降低了多个task之间执行的影响，对于单个task来说，哪怕配置了线程池，依旧会因为上次执行的阻塞影响到下一次触发 Scheduled的执行频率&#160; &#160; &#160; &#160;Scheduled的执行频率可以由2种方式控制，一种为在@Scheduled中添加fixedRate属性，即@Scheduled(fixedRate = 10)，数字为执行的间隔毫秒，也就是多少毫秒执行一次 &#160; &#160; &#160; &#160;另一种为添加cron属性，属性值为cron表达式，可以通过cron表达式指定为具体某年某月某分某秒，也可以通过cron表达式指定为间隔几小时或几分钟执行一次,如@Scheduled(cron = “0 0 1 * * *”)]]></content>
+<search> 
+  
+  
+    
+    <entry>
+      <title>xxl-job较深入使用</title>
+      <link href="/2019/12/31/xxl-job%E8%BE%83%E6%B7%B1%E5%85%A5%E4%BD%BF%E7%94%A8/"/>
+      <url>/2019/12/31/xxl-job%E8%BE%83%E6%B7%B1%E5%85%A5%E4%BD%BF%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<p>&#160; &#160; &#160; &#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。</p><p>&#160; &#160; &#160; &#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spring-bean提供的initMethod进行启动线程选择一个端口进行注册以及监听任务调度。</p><p>&#160; &#160; &#160; &#160;公司目前引入xxl-job框架代替quartz框架作为分布式任务调度组件，并在其之上进行一定开发以及优化，所以这篇文章主要分享一些深入使用，主要是概念的详细介绍。</p><h2 id="系统关键概念介绍"><a href="#系统关键概念介绍" class="headerlink" title="系统关键概念介绍"></a>系统关键概念介绍</h2><h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><p>&#160; &#160; &#160; &#160;配置中心配置的执行器，概念上对应执行定时任务的服务，支持分布式调度以及调度的各种路由规则配置。注册方式支持自动注册和手动配置机器地址两种方式，心跳时间间隔默认为30s，失效时间90s。</p><p>&#160; &#160; &#160; &#160;执行器自动注册后，调度中心页面依旧有最长30秒的延迟显示，原因是数据库中注册表更新后，展示执行器的表是由另一个守护线程去更新的，更新频率为默认心跳时间30s，所以管理台展示会有延迟，但不影响任务调度。</p><h3 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h3><p>&#160; &#160; &#160; &#160;任务以执行器为维度配置，每个任务必须属于一个执行器，当任务触发时会根据该任务所属的执行器去寻找执行器的地址列表，然后通过配置的路由规则以及阻塞规则去去执行。</p><p>&#160; &#160; &#160; &#160;任务支持本地任务以及远程任务，本地任务即按照执行方写好的业务逻辑执行。远程任务通过GLUE，在调度中心管理台写好代码，分发到执行方去执行。建议无特殊需求的话，统一使用本地任务。</p><h4 id="任务配置项描述"><a href="#任务配置项描述" class="headerlink" title="任务配置项描述"></a>任务配置项描述</h4><p><img src="//github.com/IntoTw/2019/12/31/xxl-job较深入使用/%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E9%A1%B9.jpg" alt="任务配置项描述"><br><strong>1. 执行器</strong>：选择该任务由哪个执行器去执行<br><strong>2. 任务描述</strong>：简单描述该任务的功能以及作用，如：码上行单边行程推送<br><strong>3. 路由策略</strong>：设置任务执行时，如何去选择执行器，高频任务建议使用一致性哈希或者第一台执行<br><strong>4. Cron</strong>：Cron表达式，描述任务运行的时间<br><strong>5. 运行模式</strong>：BEAN即为接入服务配置在本地对应的handler运行，其他方式均为管理台设置代码交由接入服务远程执行<br><strong>6. JobHandler</strong>：运行模式为BEAN时必填，值应当为接入服务本地执行任务的handler<br><strong>7. 阻塞策略</strong>：当同一任务多次调度到同一台执行器时，执行器应当使用的策略<br><strong>8. 子任务ID</strong>：如配置，则该任务完成后自动触发一次子任务的执行<br><strong>9. 任务超时时间</strong>：配置后当任务超时时将自动终止任务执行。<br><strong>10. 失败重试次数</strong>：任务失败后重试的次数。<br><strong>11. 负责人</strong>：一般为该任务接入方的负责人<br><strong>12. 报警邮件</strong>：任务报警后发送的邮件地址<br><strong>13. 任务参数</strong>：若配置了任务参数，任务调度时将发送任务参数至执行方handler。</p><h3 id="阻塞策略"><a href="#阻塞策略" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;阻塞策略即同一个任务在执行器的阻塞执行策略。由执行器端控制。典型场景为：任务A分发到执行器A执行，此时任务A再次触发并分发到执行器A，此时根据阻塞策略选择的不同将会有以下三种执行策略：<br><strong>1. 单机串行</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会将后续的任务放入执行线程的队列中，等待线程轮询继续执行，可能会导致线程队列阻塞过多任务导致内存过高，<strong>高频且耗时较长任务慎用</strong>。<strong>2. 丢弃后续调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会直接丢弃后续同一任务的调度，<strong>推荐使用</strong>。<strong>3. 3.    覆盖之前调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，将会直接停止正在执行的任务（通过线程InterruptedException异常以及volatile变量判断），并将新任务放入队列。<strong>一般情况下不建议使用</strong>。</p><h3 id="阻塞策略-1"><a href="#阻塞策略-1" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;路由策略即任务在配置中心进行调度分发时，选择执行器的策略。由配置中心端控制。典型场景为：任务A触发执行，任务A对应的执行器有执行器A，B，C，D，此时根据路由策略的选择将会有以下几种分发情况<br><strong>1. 第一个</strong>：始终选择第一台执行器作为任务执行器，不论该任务执行器是否正常。<br><strong>2. 最后一个</strong>：始终选择最后一台作为任务执行器<br><strong>3. 轮询</strong>：每个执行器轮流执行<br><strong>4. 随机</strong>：随机选择一个执行器执行<br><strong>5. 一致性HASH</strong>：根据任务ID做一致性哈希选择执行器，<strong>同一个任务必定只分发到同一个执行器。高频且耗时较长任务推荐使用</strong><br><strong>6. 最不经常使用</strong>：选择平均使用频率最低的执行器。<br><strong>7. 最近最久未使用</strong>：选择最近的最久未使用的执行器。<br><strong>8. 故障转移</strong>：分别进行心跳检测，选择第一台心跳检测正常的机器执行。<br><strong>9. 忙碌转移</strong>：分别进行忙碌检测，选择第一台空闲的机器执行。<br><strong>10. 分片广播</strong>：广播到所有执行器执行，并提供分片参数，分片参数获取方式如下，应用在被触发时动态获取自己是第几个分片，共有几个分片：</p>]]></content>
+      
+      
       <categories>
-        <category>SpringBoot</category>
+          
+          <category> 分布式系统 </category>
+          
       </categories>
-      <tags>
-        <tag>SpringBoot</tag>
-        <tag>Scheduled</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[不继续使用CSDN的原因]]></title>
-    <url>%2F2019%2F06%2F27%2F%E4%B8%8D%E7%BB%A7%E7%BB%AD%E4%BD%BF%E7%94%A8CSDN%E7%9A%84%E5%8E%9F%E5%9B%A0%2F</url>
-    <content type="text"><![CDATA[&#160; &#160; &#160; &#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。 &#160; &#160; &#160; &#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然就是CSDN的内容，但是点进去竟然是类似于站内搜索的页面，只列出了一些内容相关的，但是在某度的页面上显示确实关键字完全匹配，这顿时让我觉得十分恶心。 &#160; &#160; &#160; &#160;所以抽空自己搞了下Hexo，不过有点想吐槽下，基本就是照着别人的教程弄，这东西想搞明白还是得NodeJs和前端都比较了解的人才能看懂或者定制化，有点伤。 &#160; &#160; &#160; &#160;不过一顿操作后，写写文章是没什么问题了，以后就在这里写吧。 &#160; &#160; &#160; &#160;就这样。]]></content>
+      
+      
+        <tags>
+            
+            <tag> xxl-job </tag>
+            
+            <tag> 定时任务调度 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Spring Boot Scheduled定时任务特性</title>
+      <link href="/2019/07/03/Spring-Boot-Scheduled%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%89%B9%E6%80%A7/"/>
+      <url>/2019/07/03/Spring-Boot-Scheduled%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%89%B9%E6%80%A7/</url>
+      
+        <content type="html"><![CDATA[<p>&#160; &#160; &#160; &#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务</p><p>&#160; &#160; &#160; &#160;下面说说使用时要注意的Scheduled的几个特性</p><h2 id="Scheduled的执行方式"><a href="#Scheduled的执行方式" class="headerlink" title="Scheduled的执行方式"></a>Scheduled的执行方式</h2><p>&#160; &#160; &#160; &#160;Scheduled按照顺序执行，对于某个task未做配置的话只会起一个线程去执行，也就是说当你某个任务在处理中阻塞了，哪怕轮询时间再次到达，Spring也不会再起线程执行该任务，而是会等待上次任务执行完毕，所以请不要在Scheduled的task中做一些比较需要频繁触发的易失败，易阻塞，易超时操作，避免任务无法正常轮询执行</p><h2 id="Scheduled中的线程池"><a href="#Scheduled中的线程池" class="headerlink" title="Scheduled中的线程池"></a>Scheduled中的线程池</h2><p>&#160; &#160; &#160; &#160;Scheduled执行可以通过Spring Boot提供的配置来配置定时任务执行的线程池等信息，如果未做配置的话，根据我测试，所有定时任务仅有一个线程去执行，也就是说如果某个task阻塞，其他task都将得不到执行。具体配置方法如下</p><pre><code>@Configuration@EnableSchedulingpublic class SchedulerTaskConfiguration implements SchedulingConfigurer {    @Override    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {        scheduledTaskRegistrar.setScheduler(taskExecutor());    }    @Bean    public Executor taskExecutor() {        //线程池大小        return Executors.newScheduledThreadPool(10);    }}</code></pre><p>&#160; &#160; &#160; &#160;但是哪怕是配置了线程池，也只是降低了多个task之间执行的影响，对于单个task来说，哪怕配置了线程池，依旧会因为上次执行的阻塞影响到下一次触发</p><h2 id="Scheduled的执行频率"><a href="#Scheduled的执行频率" class="headerlink" title="Scheduled的执行频率"></a>Scheduled的执行频率</h2><p>&#160; &#160; &#160; &#160;Scheduled的执行频率可以由2种方式控制，一种为在@Scheduled中添加fixedRate属性，即@Scheduled(fixedRate = 10)，数字为执行的间隔毫秒，也就是多少毫秒执行一次</p><p>&#160; &#160; &#160; &#160;另一种为添加cron属性，属性值为cron表达式，可以通过cron表达式指定为具体某年某月某分某秒，也可以通过cron表达式指定为间隔几小时或几分钟执行一次,如<strong>@Scheduled(cron = “0 0 1 * * *”)</strong></p>]]></content>
+      
+      
       <categories>
-        <category>随笔</category>
+          
+          <category> SpringBoot </category>
+          
       </categories>
-      <tags>
-        <tag>随笔</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Git使用详解]]></title>
-    <url>%2F2019%2F06%2F27%2FGit%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3%2F</url>
-    <content type="text"><![CDATA[&#160; &#160; &#160; &#160;之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。 &#160; &#160; &#160; &#160;因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。 所以顺带也研究了一下这个问题 &#160; &#160; &#160; &#160;下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么 版本号&#160; &#160; &#160; &#160;Git本身有版本号的概念，版本号基于每次commit，查看最近的commit可以使用git log查看，查看所有历史版本可以使用git reflog查看所有本地commit的版本号，使用这两个命令可以查看到commit过的记录和commit时填写的信息，但是命令行内查看好像暂时不支持中文的commit信息显示。 仓库&#160; &#160; &#160; &#160;Git有2个仓库概念，一个是远端仓库，一个是本地仓库。在本地和远端之间同步的时候一定要谨慎 本地仓库&#160; &#160; &#160; &#160;实际上，在不使用fetch，pull，push，merge这几个命令的情况下，Git是仅使用本地仓库就可以完成版本管理的，主要的命令（或者说是操作）涉及到add，commit。 add操作用于将目录下的文件添加到Git的工作空间里去，同目录下未使用add命令添加过的文件，是不参与到git版本管理中去的，也就是说是独立于Git的。 commit操作用于提交修改，仅限于本地，用于提交每次修改，commit会产生一个commit id，这个id标识这次commit，在本地的话，实际上版本管理就是不断基于commit做的版本管理，假设commit过3次内容为A,B,C。C为最后commit的版本，此时想回退，只需要git reset commitid –hard 命令，就能把本地仓库回退到B或A的那次commit。 revert用于在某次commit之后，假设commit id为A，此时做了一系列修改，但未commit，此时revert会将所有修改取消，回归到commit id为A时的状态。 远程仓库&#160; &#160; &#160; &#160;实际上，远程仓库仅仅可以看做是一个代码的备份，是一个公共的备份，也就是说，在每次push后，你的本地仓库和远程仓库所有文件应该是一模一样的，通过push的话，会把本地的所有commit同步到远程仓库上去，也就是说，远程仓库的commit过程应该是每个人在本地commit的总和，但可能顺序不同。 &#160; &#160; &#160; &#160;对本地仓库来说，pull就等于同步远端仓库到本地仓库加merge，push就等于把本地仓库同步到远端仓库加merge。 &#160; &#160; &#160; &#160;Merge的本质，是将两个分支同步，实际上都是在本地merge。说一下这个过程，假设现在远端仓库版本为A，此时小g和小w同时从A上pull到了本地仓库将他们自己的本地仓库同步到了远端的版本A，此时他们的本地仓库我们假设为A1，A2，他们基于A1,A2做了自己的修改，并且同时修改了test.txt，然后都想提交到远端，第一个提交的人肯定可以提交成功，但是第二个提交的人必定会出现push失败，需要merge该文件，此时他在idea中merge了该文件确认自己改的才是对的，然后再push，此时就成功了。 &#160; &#160; &#160; &#160;解释一下，此时的merge实际过程是他处理了冲突之后，又进行了一次针对merge的commit，此次commit专门用来处理冲突并提交，具体体现在idea里你会发现，有的时候会让你选accept theirs,accept yours，你选了accept yours或者全部按照你本地来作为最终版本的文件，不需要commit，如果你选的是accept theirs或者merge的时候选择了远端的修改，那么你本地需要全部commit一次再提交，也就是说实际处理的merge是在本地确认了merge结果，这次commit和push实际idea是做了特殊处理的，带着merge的头，所以可以不会再次触发冲突，idea直接通过强制-force push到远端。 Bug修改，Hotfix&#160; &#160; &#160; &#160;之前考虑到生产环境修改，紧急bug修复，会基于生产环境分支创建一个hotfix分支，做修改完成后由prod分支合并hotfix分支，然后删除hotfix分支，但是这带来了一个问题，该hotfix分支难以合并到例如dev，test等分支，因为： 1.配置文件问题，从hotfix分支merge到dev分支，会导致dev等分支配置文件被覆盖，十分麻烦 2.版本管理问题，如果dev此时分支远远超前prod分支，那么此时将不可能合并hotfix的修改到dev上 可以通过git的stash功能解决这个问题。 &#160; &#160; &#160; &#160;stash和他的操作unstash的本质，是创建一个修改副本。他的应用场景和操作模式在于，有的时候本地做了一系列修改，但是忽然又要全部回到修改前的时候进行一下打包，此时要么从新从远端拉一个分支到本地，要么就直接copy一份项目到其他目录，然后这个目录下的revert掉，改完覆盖回来。 &#160; &#160; &#160; &#160;stash可以轻松解决，stash可以对当前所有的修改（具体提现到所有蓝色的文件）做一个备份，创建一个stash后，项目会自动回到当前commit id的状态（相当于revert），相当于对所有修改做了一个另外的保存，然后可以通过unstash可以把这些修改还原回来。 &#160; &#160; &#160; &#160;这样的话通过这个功能可以很轻松的解决这个问题，本地check出来hotfix分支之后，修改完毕不要先commit，先进行stash，然后unstash回来，再进行commit，push。完成后回到dev分支进行unstash同样进行一下更改，就把更改应用在dev分支上了。]]></content>
+      
+      
+        <tags>
+            
+            <tag> SpringBoot </tag>
+            
+            <tag> Scheduled </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>不继续使用CSDN的原因</title>
+      <link href="/2019/06/27/%E4%B8%8D%E7%BB%A7%E7%BB%AD%E4%BD%BF%E7%94%A8CSDN%E7%9A%84%E5%8E%9F%E5%9B%A0/"/>
+      <url>/2019/06/27/%E4%B8%8D%E7%BB%A7%E7%BB%AD%E4%BD%BF%E7%94%A8CSDN%E7%9A%84%E5%8E%9F%E5%9B%A0/</url>
+      
+        <content type="html"><![CDATA[<p>&#160; &#160; &#160; &#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。</p><p>&#160; &#160; &#160; &#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然就是CSDN的内容，但是点进去竟然是类似于站内搜索的页面，只列出了一些内容相关的，但是在某度的页面上显示确实关键字完全匹配，这顿时让我觉得十分恶心。</p><p>&#160; &#160; &#160; &#160;所以抽空自己搞了下Hexo，不过有点想吐槽下，基本就是照着别人的教程弄，这东西想搞明白还是得NodeJs和前端都比较了解的人才能看懂或者定制化，有点伤。</p><p>&#160; &#160; &#160; &#160;不过一顿操作后，写写文章是没什么问题了，以后就在这里写吧。</p><p>&#160; &#160; &#160; &#160;就这样。</p>]]></content>
+      
+      
       <categories>
-        <category>Git</category>
+          
+          <category> 随笔 </category>
+          
       </categories>
-      <tags>
-        <tag>git</tag>
-        <tag>Git</tag>
-      </tags>
-  </entry>
+      
+      
+        <tags>
+            
+            <tag> 随笔 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Git使用详解</title>
+      <link href="/2019/06/27/Git%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/"/>
+      <url>/2019/06/27/Git%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/</url>
+      
+        <content type="html"><![CDATA[<p>&#160; &#160; &#160; &#160;之前公司要做技术分享，因为Git虽然看似简单，但是实际上是使用较多而且较为重要的一个工具，所以做了一下大概的总结。</p><p>&#160; &#160; &#160; &#160;因为新来的同事问了一个问题，紧急版本要拉hotfix分支修改，但是hotfix分支如何优雅的合并到各个分支上去呢？尤其是hotfix修改的位置比较敏感的情况下。</p><p>所以顺带也研究了一下这个问题</p><p>&#160; &#160; &#160; &#160;下面根据Git最关键的几个概念，穿插了Git几个命令实际做了什么</p><h2 id="版本号"><a href="#版本号" class="headerlink" title="版本号"></a>版本号</h2><p>&#160; &#160; &#160; &#160;Git本身有版本号的概念，版本号基于每次<strong>commit</strong>，查看最近的<strong>commit</strong>可以使用<strong>git log</strong>查看，查看所有历史版本可以使用<strong>git reflog</strong>查看所有本地commit的版本号，使用这两个命令可以查看到commit过的记录和commit时填写的信息，但是命令行内查看好像暂时不支持中文的commit信息显示。</p><h2 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h2><p>&#160; &#160; &#160; &#160;Git有2个仓库概念，一个是远端仓库，一个是本地仓库。在本地和远端之间同步的时候一定要谨慎</p><h2 id="本地仓库"><a href="#本地仓库" class="headerlink" title="本地仓库"></a>本地仓库</h2><p>&#160; &#160; &#160; &#160;实际上，在不使用<strong>fetch，pull，push，merge</strong>这几个命令的情况下，Git是仅使用本地仓库就可以完成版本管理的，主要的命令（或者说是操作）涉及到<strong>add，commit</strong>。</p><p><strong>add操作</strong>用于将目录下的文件添加到Git的工作空间里去，同目录下未使用add命令添加过的文件，是不参与到git版本管理中去的，也就是说是独立于Git的。</p><p><strong>commit操作</strong>用于提交修改，仅限于本地，用于提交每次修改，commit会产生一个commit id，这个id标识这次commit，在本地的话，实际上版本管理就是不断基于commit做的版本管理，假设commit过3次内容为A,B,C。C为最后commit的版本，此时想回退，只需要git reset commitid –hard 命令，就能把本地仓库回退到B或A的那次commit。</p><p><strong>revert</strong>用于在某次commit之后，假设commit id为A，此时做了一系列修改，但未commit，此时revert会将所有修改取消，回归到commit id为A时的状态。</p><h2 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h2><p>&#160; &#160; &#160; &#160;实际上，远程仓库仅仅可以看做是一个代码的备份，是一个公共的备份，也就是说，在每次<strong>push</strong>后，<strong>你的本地仓库和远程仓库所有文件应该是一模一样的</strong>，通过push的话，会把本地的所有commit同步到远程仓库上去，也就是说，<strong>远程仓库的commit过程应该是每个人在本地commit的总和，但可能顺序不同。</strong></p><p>&#160; &#160; &#160; &#160;对本地仓库来说，pull就等于同步远端仓库到本地仓库加merge，push就等于把本地仓库同步到远端仓库加merge。</p><p>&#160; &#160; &#160; &#160;Merge的本质，是将两个分支同步，实际上都是在本地merge。说一下这个过程，假设现在远端仓库版本为A，此时小g和小w同时从A上pull到了本地仓库将他们自己的本地仓库同步到了远端的版本A，此时他们的本地仓库我们假设为A1，A2，他们基于A1,A2做了自己的修改，并且同时修改了test.txt，然后都想提交到远端，第一个提交的人肯定可以提交成功，但是第二个提交的人必定会出现push失败，需要merge该文件，此时他在idea中merge了该文件确认自己改的才是对的，然后再push，此时就成功了。</p><p>&#160; &#160; &#160; &#160;解释一下，此时的merge实际过程是他处理了冲突之后，又进行了一次针对merge的commit，此次commit专门用来处理冲突并提交，具体体现在idea里你会发现，有的时候会让你选accept theirs,accept yours，你选了accept yours或者全部按照你本地来作为最终版本的文件，不需要commit，如果你选的是accept theirs或者merge的时候选择了远端的修改，那么你本地需要全部commit一次再提交，也就是说实际处理的merge是在本地确认了merge结果，这次commit和push实际idea是做了特殊处理的，带着merge的头，所以可以不会再次触发冲突，idea直接通过强制-force push到远端。</p><h2 id="Bug修改，Hotfix"><a href="#Bug修改，Hotfix" class="headerlink" title="Bug修改，Hotfix"></a>Bug修改，Hotfix</h2><p>&#160; &#160; &#160; &#160;之前考虑到生产环境修改，紧急bug修复，会基于生产环境分支创建一个hotfix分支，做修改完成后由prod分支合并hotfix分支，然后删除hotfix分支，但是这带来了一个问题，该hotfix分支难以合并到例如dev，test等分支，因为：</p><p>1.配置文件问题，从hotfix分支merge到dev分支，会导致dev等分支配置文件被覆盖，十分麻烦</p><p>2.版本管理问题，如果dev此时分支远远超前prod分支，那么此时将不可能合并hotfix的修改到dev上</p><p>可以通过git的stash功能解决这个问题。</p><p>&#160; &#160; &#160; &#160;stash和他的操作unstash的本质，是创建一个修改副本。他的应用场景和操作模式在于，有的时候本地做了一系列修改，但是忽然又要全部回到修改前的时候进行一下打包，此时要么从新从远端拉一个分支到本地，要么就直接copy一份项目到其他目录，然后这个目录下的revert掉，改完覆盖回来。</p><p>&#160; &#160; &#160; &#160;stash可以轻松解决，stash可以对当前所有的修改（具体提现到所有蓝色的文件）做一个备份，创建一个stash后，项目会自动回到当前commit id的状态（相当于revert），相当于对所有修改做了一个另外的保存，然后可以通过unstash可以把这些修改还原回来。</p><p>&#160; &#160; &#160; &#160;这样的话通过这个功能可以很轻松的解决这个问题，本地check出来hotfix分支之后，修改完毕不要先commit，先进行stash，然后unstash回来，再进行commit，push。完成后回到dev分支进行unstash同样进行一下更改，就把更改应用在dev分支上了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Git </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+            <tag> Git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
 </search>

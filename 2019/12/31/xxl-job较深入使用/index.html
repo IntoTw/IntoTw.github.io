@@ -101,18 +101,20 @@
 
 
 
-  <meta name="description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然">
-<meta name="keywords" content="随笔">
+  <meta name="description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spr">
+<meta name="keywords" content="xxl-job,定时任务调度">
 <meta property="og:type" content="article">
-<meta property="og:title" content="不继续使用CSDN的原因">
-<meta property="og:url" content="https://github.com/IntoTw/2019/06/27/不继续使用CSDN的原因/index.html">
+<meta property="og:title" content="xxl-job较深入使用">
+<meta property="og:url" content="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/index.html">
 <meta property="og:site_name" content="IntoTw">
-<meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然">
+<meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spr">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-06-27T09:24:25.692Z">
+<meta property="og:image" content="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E9%A1%B9.jpg">
+<meta property="og:updated_time" content="2019-12-31T10:26:19.709Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="不继续使用CSDN的原因">
-<meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然">
+<meta name="twitter:title" content="xxl-job较深入使用">
+<meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spr">
+<meta name="twitter:image" content="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E9%A1%B9.jpg">
 
 
 
@@ -120,7 +122,7 @@
 
   
   
-  <link rel="canonical" href="https://github.com/IntoTw/2019/06/27/不继续使用CSDN的原因/">
+  <link rel="canonical" href="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/">
 
 
 
@@ -130,7 +132,7 @@
   };
 </script>
 
-  <title>不继续使用CSDN的原因 | IntoTw</title>
+  <title>xxl-job较深入使用 | IntoTw</title>
   
 
 
@@ -386,7 +388,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/IntoTw/2019/06/27/不继续使用CSDN的原因/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="IntoTw">
@@ -403,7 +405,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">不继续使用CSDN的原因
+          <h1 class="post-title" itemprop="name headline">xxl-job较深入使用
 
               
             
@@ -429,7 +431,7 @@
                 
               
 
-              <time title="创建时间：2019-06-27 17:24:03 / 修改时间：17:24:25" itemprop="dateCreated datePublished" datetime="2019-06-27T17:24:03+08:00">2019-06-27</time>
+              <time title="创建时间：2019-12-31 19:32:06 / 修改时间：18:26:19" itemprop="dateCreated datePublished" datetime="2019-12-31T19:32:06+08:00">2019-12-31</time>
             
 
             
@@ -451,7 +453,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/随笔/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/分布式系统/" itemprop="url" rel="index"><span itemprop="name">分布式系统</span></a></span>
 
                 
                 
@@ -486,11 +488,18 @@
       
 
       
-        <p>&#160; &#160; &#160; &#160;一直了解到很多人选择Hexo搭建自己的博客，本来想在自己云服务器上搭一个的，后面了解到Github可以通过静态资源的映射免费搞，还挺方便的，但是因为懒，一直就在CSDN写写，毕竟从大学开始就在CSDN上各种查资料和学习。</p>
-<p>&#160; &#160; &#160; &#160;或许什么事都会变质吧，最近在某度查一个DB2的问题，发现置顶的2条竟然就是CSDN的内容，但是点进去竟然是类似于站内搜索的页面，只列出了一些内容相关的，但是在某度的页面上显示确实关键字完全匹配，这顿时让我觉得十分恶心。</p>
-<p>&#160; &#160; &#160; &#160;所以抽空自己搞了下Hexo，不过有点想吐槽下，基本就是照着别人的教程弄，这东西想搞明白还是得NodeJs和前端都比较了解的人才能看懂或者定制化，有点伤。</p>
-<p>&#160; &#160; &#160; &#160;不过一顿操作后，写写文章是没什么问题了，以后就在这里写吧。</p>
-<p>&#160; &#160; &#160; &#160;就这样。</p>
+        <p>&#160; &#160; &#160; &#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。</p>
+<p>&#160; &#160; &#160; &#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spring-bean提供的initMethod进行启动线程选择一个端口进行注册以及监听任务调度。</p>
+<p>&#160; &#160; &#160; &#160;公司目前引入xxl-job框架代替quartz框架作为分布式任务调度组件，并在其之上进行一定开发以及优化，所以这篇文章主要分享一些深入使用，主要是概念的详细介绍。</p>
+<h2 id="系统关键概念介绍"><a href="#系统关键概念介绍" class="headerlink" title="系统关键概念介绍"></a>系统关键概念介绍</h2><h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><p>&#160; &#160; &#160; &#160;配置中心配置的执行器，概念上对应执行定时任务的服务，支持分布式调度以及调度的各种路由规则配置。注册方式支持自动注册和手动配置机器地址两种方式，心跳时间间隔默认为30s，失效时间90s。</p>
+<p>&#160; &#160; &#160; &#160;执行器自动注册后，调度中心页面依旧有最长30秒的延迟显示，原因是数据库中注册表更新后，展示执行器的表是由另一个守护线程去更新的，更新频率为默认心跳时间30s，所以管理台展示会有延迟，但不影响任务调度。</p>
+<h3 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h3><p>&#160; &#160; &#160; &#160;任务以执行器为维度配置，每个任务必须属于一个执行器，当任务触发时会根据该任务所属的执行器去寻找执行器的地址列表，然后通过配置的路由规则以及阻塞规则去去执行。</p>
+<p>&#160; &#160; &#160; &#160;任务支持本地任务以及远程任务，本地任务即按照执行方写好的业务逻辑执行。远程任务通过GLUE，在调度中心管理台写好代码，分发到执行方去执行。建议无特殊需求的话，统一使用本地任务。</p>
+<h4 id="任务配置项描述"><a href="#任务配置项描述" class="headerlink" title="任务配置项描述"></a>任务配置项描述</h4><p><img src="//github.com/IntoTw/2019/12/31/xxl-job较深入使用/%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E9%A1%B9.jpg" alt="任务配置项描述"><br><strong>1. 执行器</strong>：选择该任务由哪个执行器去执行<br><strong>2. 任务描述</strong>：简单描述该任务的功能以及作用，如：码上行单边行程推送<br><strong>3. 路由策略</strong>：设置任务执行时，如何去选择执行器，高频任务建议使用一致性哈希或者第一台执行<br><strong>4. Cron</strong>：Cron表达式，描述任务运行的时间<br><strong>5. 运行模式</strong>：BEAN即为接入服务配置在本地对应的handler运行，其他方式均为管理台设置代码交由接入服务远程执行<br><strong>6. JobHandler</strong>：运行模式为BEAN时必填，值应当为接入服务本地执行任务的handler<br><strong>7. 阻塞策略</strong>：当同一任务多次调度到同一台执行器时，执行器应当使用的策略<br><strong>8. 子任务ID</strong>：如配置，则该任务完成后自动触发一次子任务的执行<br><strong>9. 任务超时时间</strong>：配置后当任务超时时将自动终止任务执行。<br><strong>10. 失败重试次数</strong>：任务失败后重试的次数。<br><strong>11. 负责人</strong>：一般为该任务接入方的负责人<br><strong>12. 报警邮件</strong>：任务报警后发送的邮件地址<br><strong>13. 任务参数</strong>：若配置了任务参数，任务调度时将发送任务参数至执行方handler。</p>
+<h3 id="阻塞策略"><a href="#阻塞策略" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;阻塞策略即同一个任务在执行器的阻塞执行策略。由执行器端控制。典型场景为：任务A分发到执行器A执行，此时任务A再次触发并分发到执行器A，此时根据阻塞策略选择的不同将会有以下三种执行策略：<br><strong>1. 单机串行</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会将后续的任务放入执行线程的队列中，等待线程轮询继续执行，可能会导致线程队列阻塞过多任务导致内存过高，<strong>高频且耗时较长任务慎用</strong>。
+<strong>2. 丢弃后续调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会直接丢弃后续同一任务的调度，<strong>推荐使用</strong>。
+<strong>3. 3.    覆盖之前调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，将会直接停止正在执行的任务（通过线程InterruptedException异常以及volatile变量判断），并将新任务放入队列。<strong>一般情况下不建议使用</strong>。</p>
+<h3 id="阻塞策略-1"><a href="#阻塞策略-1" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;路由策略即任务在配置中心进行调度分发时，选择执行器的策略。由配置中心端控制。典型场景为：任务A触发执行，任务A对应的执行器有执行器A，B，C，D，此时根据路由策略的选择将会有以下几种分发情况<br><strong>1. 第一个</strong>：始终选择第一台执行器作为任务执行器，不论该任务执行器是否正常。<br><strong>2. 最后一个</strong>：始终选择最后一台作为任务执行器<br><strong>3. 轮询</strong>：每个执行器轮流执行<br><strong>4. 随机</strong>：随机选择一个执行器执行<br><strong>5. 一致性HASH</strong>：根据任务ID做一致性哈希选择执行器，<strong>同一个任务必定只分发到同一个执行器。高频且耗时较长任务推荐使用</strong><br><strong>6. 最不经常使用</strong>：选择平均使用频率最低的执行器。<br><strong>7. 最近最久未使用</strong>：选择最近的最久未使用的执行器。<br><strong>8. 故障转移</strong>：分别进行心跳检测，选择第一台心跳检测正常的机器执行。<br><strong>9. 忙碌转移</strong>：分别进行忙碌检测，选择第一台空闲的机器执行。<br><strong>10. 分片广播</strong>：广播到所有执行器执行，并提供分片参数，分片参数获取方式如下，应用在被触发时动态获取自己是第几个分片，共有几个分片：</p>
 
       
     </div>
@@ -503,6 +512,35 @@
 	<div>
       
         
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2019/12/31/xxl-job较深入使用/">xxl-job较深入使用</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 IntoTw 的个人博客">IntoTw</a></p>
+  <p><span>发布时间:</span>2019年12月31日 - 19:12</p>
+  <p><span>最后更新:</span>2019年12月31日 - 18:12</p>
+  <p><span>原始链接:</span><a href="/2019/12/31/xxl-job较深入使用/" title="xxl-job较深入使用">https://intotw.github.io/2019/12/31/xxl-job较深入使用/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://intotw.github.io/2019/12/31/xxl-job较深入使用/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+    });
+    });  
+</script>
+
       
 	</div>
     
@@ -530,7 +568,9 @@
         
         <div class="post-tags">
           
-            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+            <a href="/tags/xxl-job/" rel="tag"># xxl-job</a>
+          
+            <a href="/tags/定时任务调度/" rel="tag"># 定时任务调度</a>
           
         </div>
       
@@ -543,8 +583,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/06/27/Git使用详解/" rel="next" title="Git使用详解">
-                <i class="fa fa-chevron-left"></i> Git使用详解
+              <a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/" rel="next" title="Spring Boot Scheduled定时任务特性">
+                <i class="fa fa-chevron-left"></i> Spring Boot Scheduled定时任务特性
               </a>
             
           </div>
@@ -552,10 +592,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/" rel="prev" title="Spring Boot Scheduled定时任务特性">
-                Spring Boot Scheduled定时任务特性 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -599,8 +635,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -714,6 +759,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统关键概念介绍"><span class="nav-number">1.</span> <span class="nav-text">系统关键概念介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行器"><span class="nav-number">1.1.</span> <span class="nav-text">执行器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务"><span class="nav-number">1.2.</span> <span class="nav-text">任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#任务配置项描述"><span class="nav-number">1.2.1.</span> <span class="nav-text">任务配置项描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞策略"><span class="nav-number">1.3.</span> <span class="nav-text">阻塞策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞策略-1"><span class="nav-number">1.4.</span> <span class="nav-text">阻塞策略</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
