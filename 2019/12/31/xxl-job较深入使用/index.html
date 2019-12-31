@@ -110,7 +110,7 @@
 <meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spr">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://github.com/IntoTw/2019/12/31/xxl-job较深入使用/%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E9%A1%B9.jpg">
-<meta property="og:updated_time" content="2019-12-31T10:26:19.709Z">
+<meta property="og:updated_time" content="2019-12-31T10:36:49.438Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="xxl-job较深入使用">
 <meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job是一个分布式定时任务调度框架，功能强大，底层使用自己实现的rpc框架进行注册和管理，数据库使用mysql，调度触发使用数据库锁来作为调度触发锁。 &amp;#160; &amp;#160; &amp;#160; &amp;#160;xxl-job主要分为调度中心admin以及任务，任务引入依赖jar包并配置启动类为spring所管理的bean后，将自动通过spr">
@@ -431,7 +431,7 @@
                 
               
 
-              <time title="创建时间：2019-12-31 19:32:06 / 修改时间：18:26:19" itemprop="dateCreated datePublished" datetime="2019-12-31T19:32:06+08:00">2019-12-31</time>
+              <time title="创建时间：2019-12-31 19:32:06 / 修改时间：18:36:49" itemprop="dateCreated datePublished" datetime="2019-12-31T19:32:06+08:00">2019-12-31</time>
             
 
             
@@ -499,7 +499,7 @@
 <h3 id="阻塞策略"><a href="#阻塞策略" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;阻塞策略即同一个任务在执行器的阻塞执行策略。由执行器端控制。典型场景为：任务A分发到执行器A执行，此时任务A再次触发并分发到执行器A，此时根据阻塞策略选择的不同将会有以下三种执行策略：<br><strong>1. 单机串行</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会将后续的任务放入执行线程的队列中，等待线程轮询继续执行，可能会导致线程队列阻塞过多任务导致内存过高，<strong>高频且耗时较长任务慎用</strong>。
 <strong>2. 丢弃后续调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，会直接丢弃后续同一任务的调度，<strong>推荐使用</strong>。
 <strong>3. 3.    覆盖之前调度</strong> 该策略下，<strong>同一执行器</strong>收到<strong>同一任务</strong>的调度触发时，若已有任务正在执行，将会直接停止正在执行的任务（通过线程InterruptedException异常以及volatile变量判断），并将新任务放入队列。<strong>一般情况下不建议使用</strong>。</p>
-<h3 id="阻塞策略-1"><a href="#阻塞策略-1" class="headerlink" title="阻塞策略"></a>阻塞策略</h3><p>&#160; &#160; &#160; &#160;路由策略即任务在配置中心进行调度分发时，选择执行器的策略。由配置中心端控制。典型场景为：任务A触发执行，任务A对应的执行器有执行器A，B，C，D，此时根据路由策略的选择将会有以下几种分发情况<br><strong>1. 第一个</strong>：始终选择第一台执行器作为任务执行器，不论该任务执行器是否正常。<br><strong>2. 最后一个</strong>：始终选择最后一台作为任务执行器<br><strong>3. 轮询</strong>：每个执行器轮流执行<br><strong>4. 随机</strong>：随机选择一个执行器执行<br><strong>5. 一致性HASH</strong>：根据任务ID做一致性哈希选择执行器，<strong>同一个任务必定只分发到同一个执行器。高频且耗时较长任务推荐使用</strong><br><strong>6. 最不经常使用</strong>：选择平均使用频率最低的执行器。<br><strong>7. 最近最久未使用</strong>：选择最近的最久未使用的执行器。<br><strong>8. 故障转移</strong>：分别进行心跳检测，选择第一台心跳检测正常的机器执行。<br><strong>9. 忙碌转移</strong>：分别进行忙碌检测，选择第一台空闲的机器执行。<br><strong>10. 分片广播</strong>：广播到所有执行器执行，并提供分片参数，分片参数获取方式如下，应用在被触发时动态获取自己是第几个分片，共有几个分片：</p>
+<h3 id="路由策略"><a href="#路由策略" class="headerlink" title="路由策略"></a>路由策略</h3><p>&#160; &#160; &#160; &#160;路由策略即任务在配置中心进行调度分发时，选择执行器的策略。由配置中心端控制。典型场景为：任务A触发执行，任务A对应的执行器有执行器A，B，C，D，此时根据路由策略的选择将会有以下几种分发情况<br><strong>1. 第一个</strong>：始终选择第一台执行器作为任务执行器，不论该任务执行器是否正常。<br><strong>2. 最后一个</strong>：始终选择最后一台作为任务执行器<br><strong>3. 轮询</strong>：每个执行器轮流执行<br><strong>4. 随机</strong>：随机选择一个执行器执行<br><strong>5. 一致性HASH</strong>：根据任务ID做一致性哈希选择执行器，<strong>同一个任务必定只分发到同一个执行器。高频且耗时较长任务推荐使用</strong><br><strong>6. 最不经常使用</strong>：选择平均使用频率最低的执行器。<br><strong>7. 最近最久未使用</strong>：选择最近的最久未使用的执行器。<br><strong>8. 故障转移</strong>：分别进行心跳检测，选择第一台心跳检测正常的机器执行。<br><strong>9. 忙碌转移</strong>：分别进行忙碌检测，选择第一台空闲的机器执行。<br><strong>10. 分片广播</strong>：广播到所有执行器执行，并提供分片参数，分片参数获取方式如下，应用在被触发时动态获取自己是第几个分片，共有几个分片：</p>
 
       
     </div>
@@ -770,7 +770,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统关键概念介绍"><span class="nav-number">1.</span> <span class="nav-text">系统关键概念介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行器"><span class="nav-number">1.1.</span> <span class="nav-text">执行器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务"><span class="nav-number">1.2.</span> <span class="nav-text">任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#任务配置项描述"><span class="nav-number">1.2.1.</span> <span class="nav-text">任务配置项描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞策略"><span class="nav-number">1.3.</span> <span class="nav-text">阻塞策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞策略-1"><span class="nav-number">1.4.</span> <span class="nav-text">阻塞策略</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统关键概念介绍"><span class="nav-number">1.</span> <span class="nav-text">系统关键概念介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行器"><span class="nav-number">1.1.</span> <span class="nav-text">执行器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务"><span class="nav-number">1.2.</span> <span class="nav-text">任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#任务配置项描述"><span class="nav-number">1.2.1.</span> <span class="nav-text">任务配置项描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞策略"><span class="nav-number">1.3.</span> <span class="nav-text">阻塞策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#路由策略"><span class="nav-number">1.4.</span> <span class="nav-text">路由策略</span></a></li></ol></li></ol></div>
             
 
           </div>
