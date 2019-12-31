@@ -101,18 +101,18 @@
 
 
 
-  <meta name="description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
+  <meta name="description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式&amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled按">
 <meta name="keywords" content="SpringBoot,Scheduled">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Boot Scheduled定时任务特性">
 <meta property="og:url" content="https://github.com/IntoTw/2019/07/03/Spring-Boot-Scheduled定时任务特性/index.html">
 <meta property="og:site_name" content="IntoTw">
-<meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
+<meta property="og:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式&amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled按">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-03T01:52:45.854Z">
+<meta property="og:updated_time" content="2019-07-03T02:00:25.825Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring Boot Scheduled定时任务特性">
-<meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式 &amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled">
+<meta name="twitter:description" content="&amp;#160; &amp;#160; &amp;#160; &amp;#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务 &amp;#160; &amp;#160; &amp;#160; &amp;#160;下面说说使用时要注意的Scheduled的几个特性 Scheduled的执行方式&amp;#160; &amp;#160; &amp;#160; &amp;#160;Scheduled按">
 
 
 
@@ -429,7 +429,7 @@
                 
               
 
-              <time title="创建时间：2019-07-03 09:32:06 / 修改时间：09:52:45" itemprop="dateCreated datePublished" datetime="2019-07-03T09:32:06+08:00">2019-07-03</time>
+              <time title="创建时间：2019-07-03 09:32:06 / 修改时间：10:00:25" itemprop="dateCreated datePublished" datetime="2019-07-03T09:32:06+08:00">2019-07-03</time>
             
 
             
@@ -488,8 +488,8 @@
       
         <p>&#160; &#160; &#160; &#160;SpringBoot中的Scheduled定时任务是Spring Boot中非常常用的特性，用来执行一些比如日切或者日终对账这种定时任务</p>
 <p>&#160; &#160; &#160; &#160;下面说说使用时要注意的Scheduled的几个特性</p>
-<pre><code>Scheduled的执行方式 </code></pre><p>&#160; &#160; &#160; &#160;Scheduled按照顺序执行，对于某个task未做配置的话只会起一个线程去执行，也就是说当你某个任务在处理中阻塞了，哪怕轮询时间再次到达，Spring也不会再起线程执行该任务，而是会等待上次任务执行完毕，所以请不要在Scheduled的task中做一些比较需要频繁触发的易失败，易阻塞，易超时操作，避免任务无法正常轮询执行</p>
-<pre><code>Scheduled中的线程池 </code></pre><p>&#160; &#160; &#160; &#160;Scheduled执行可以通过Spring Boot提供的配置来配置定时任务执行的线程池等信息，如果未做配置的话，根据我测试，所有定时任务仅有一个线程去执行，也就是说如果某个task阻塞，其他task都将得不到执行。具体配置方法如下</p>
+<h2 id="Scheduled的执行方式"><a href="#Scheduled的执行方式" class="headerlink" title="Scheduled的执行方式"></a>Scheduled的执行方式</h2><p>&#160; &#160; &#160; &#160;Scheduled按照顺序执行，对于某个task未做配置的话只会起一个线程去执行，也就是说当你某个任务在处理中阻塞了，哪怕轮询时间再次到达，Spring也不会再起线程执行该任务，而是会等待上次任务执行完毕，所以请不要在Scheduled的task中做一些比较需要频繁触发的易失败，易阻塞，易超时操作，避免任务无法正常轮询执行</p>
+<h2 id="Scheduled中的线程池"><a href="#Scheduled中的线程池" class="headerlink" title="Scheduled中的线程池"></a>Scheduled中的线程池</h2><p>&#160; &#160; &#160; &#160;Scheduled执行可以通过Spring Boot提供的配置来配置定时任务执行的线程池等信息，如果未做配置的话，根据我测试，所有定时任务仅有一个线程去执行，也就是说如果某个task阻塞，其他task都将得不到执行。具体配置方法如下</p>
 <pre><code>@Configuration
 @EnableScheduling
 public class SchedulerTaskConfiguration implements SchedulingConfigurer {
@@ -504,7 +504,7 @@ public class SchedulerTaskConfiguration implements SchedulingConfigurer {
         return Executors.newScheduledThreadPool(10);
     }
 }</code></pre><p>&#160; &#160; &#160; &#160;但是哪怕是配置了线程池，也只是降低了多个task之间执行的影响，对于单个task来说，哪怕配置了线程池，依旧会因为上次执行的阻塞影响到下一次触发</p>
-<pre><code>Scheduled的执行频率</code></pre><p>&#160; &#160; &#160; &#160;Scheduled的执行频率可以由2种方式控制，一种为在@Scheduled中添加fixedRate属性，即@Scheduled(fixedRate = 10)，数字为执行的间隔毫秒，也就是多少毫秒执行一次</p>
+<h2 id="Scheduled的执行频率"><a href="#Scheduled的执行频率" class="headerlink" title="Scheduled的执行频率"></a>Scheduled的执行频率</h2><p>&#160; &#160; &#160; &#160;Scheduled的执行频率可以由2种方式控制，一种为在@Scheduled中添加fixedRate属性，即@Scheduled(fixedRate = 10)，数字为执行的间隔毫秒，也就是多少毫秒执行一次</p>
 <p>&#160; &#160; &#160; &#160;另一种为添加cron属性，属性值为cron表达式，可以通过cron表达式指定为具体某年某月某分某秒，也可以通过cron表达式指定为间隔几小时或几分钟执行一次,如<strong>@Scheduled(cron = “0 0 1 * * *”)</strong></p>
 
       
@@ -527,7 +527,7 @@ public class SchedulerTaskConfiguration implements SchedulingConfigurer {
   <p><span>本文标题:</span><a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/">Spring Boot Scheduled定时任务特性</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 IntoTw 的个人博客">IntoTw</a></p>
   <p><span>发布时间:</span>2019年07月03日 - 09:07</p>
-  <p><span>最后更新:</span>2019年07月03日 - 09:07</p>
+  <p><span>最后更新:</span>2019年07月03日 - 10:07</p>
   <p><span>原始链接:</span><a href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/" title="Spring Boot Scheduled定时任务特性">https://intotw.github.io/2019/07/03/Spring-Boot-Scheduled定时任务特性/</a>
     <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://intotw.github.io/2019/07/03/Spring-Boot-Scheduled定时任务特性/" aria-label="复制成功！"></i></span>
   </p>
@@ -641,8 +641,17 @@ public class SchedulerTaskConfiguration implements SchedulingConfigurer {
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -750,6 +759,23 @@ public class SchedulerTaskConfiguration implements SchedulingConfigurer {
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled的执行方式"><span class="nav-number">1.</span> <span class="nav-text">Scheduled的执行方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled中的线程池"><span class="nav-number">2.</span> <span class="nav-text">Scheduled中的线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled的执行频率"><span class="nav-number">3.</span> <span class="nav-text">Scheduled的执行频率</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
