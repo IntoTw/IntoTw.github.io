@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="IntoTw">
+
+
+
+<meta name="description" content="Java为开发者编译期注解处理器的实现，即通过实现AbstractProcessor接口，在编译期对注解进行处理，在编译期可以通过操作Java语法树，修改生成的结果class文件，著名的lombok框架就是通过该原理实现的，本文详细描述了在编译期通过Java语法树操作，实现对Java编译期代码的修改">
+<meta name="keywords" content="Java,编译期注解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java编译期注解处理器详细使用方法">
+<meta property="og:url" content="https://github.com/IntoTw/2020/03/09/Java编译期注解处理器详细使用方法/index.html">
+<meta property="og:site_name" content="IntoTw&#39; blog">
+<meta property="og:description" content="Java为开发者编译期注解处理器的实现，即通过实现AbstractProcessor接口，在编译期对注解进行处理，在编译期可以通过操作Java语法树，修改生成的结果class文件，著名的lombok框架就是通过该原理实现的，本文详细描述了在编译期通过Java语法树操作，实现对Java编译期代码的修改">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-21T11:52:59.343Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java编译期注解处理器详细使用方法">
+<meta name="twitter:description" content="Java为开发者编译期注解处理器的实现，即通过实现AbstractProcessor接口，在编译期对注解进行处理，在编译期可以通过操作Java语法树，修改生成的结果class文件，著名的lombok框架就是通过该原理实现的，本文详细描述了在编译期通过Java语法树操作，实现对Java编译期代码的修改">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="IntoTw&#39; blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Java编译期注解处理器详细使用方法 | IntoTw&#39; blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">IntoTw</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:123@123.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scheduled/">Scheduled</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringBoot/">SpringBoot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-cloud/">spring cloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xxl-job/">xxl-job</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式系统/">分布式系统</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务调度/">定时任务调度</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/算法/">算法</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译期注解/">编译期注解</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/运维相关/">运维相关</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">IntoTw</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">IntoTw</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:123@123.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Java编译期注解处理器详细使用方法" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2020/03/09/Java编译期注解处理器详细使用方法/" class="article-date">
+      <time datetime="2020-03-09T07:22:36.000Z" itemprop="datePublished">2020-03-09</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java编译期注解处理器详细使用方法
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/编译期注解/">编译期注解</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="Java编译期注解处理器"><a href="#Java编译期注解处理器" class="headerlink" title="Java编译期注解处理器"></a>Java编译期注解处理器</h2><p>&#160; &#160; &#160; &#160;Java编译期注解处理器，Annotation Processing Tool，简称APT，是Java提供给开发者的用于在编译期对注解进行处理的一系列API，这类API的使用被广泛的用于各种框架，如dubbo,lombok等。<br>&#160; &#160; &#160; &#160;Java的注解处理一般分为2种，最常见也是最显式化的就是Spring以及Spring Boot的注解实现了，在运行期容器启动时，根据注解扫描类，并加载到Spring容器中。而另一种就是本文主要介绍的注解处理，即编译期注解处理器，用于在编译期通过JDK提供的API，对Java文件编译前生成的Java语法树进行处理，实现想要的功能。<br>&#160; &#160; &#160; &#160;前段公司要求将原有dubbo迁入spring cloud架构，理所当然的最简单的方式，就是将原有的dubboRpc服务类，外面封装一层controller，并且将调用改成feignClient，这样能短时间的兼容原有其他未升级云模块的dubbo调用，之前考虑过其他方案，比如spring cloud sidecar，但是出于运维组考虑，还是不建议每台机器多加一个服务，并且只是为了短时间过渡，没必要多加一个技术栈，所以考虑使用编译期处理器来快速生成类似的java代码，避免手动大量处理会产生操作失误。<br>&#160; &#160; &#160; &#160;练手项目示例的git源码：<a href="https://github.com/IntoTw/mob">https://github.com/IntoTw/mob</a></p>
+<h2 id="启用注解处理器"><a href="#启用注解处理器" class="headerlink" title="启用注解处理器"></a>启用注解处理器</h2><p>&#160; &#160; &#160; &#160;增加这么一个类，实现AbstractProcessor的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注解处理器会扫描的包名</span></span><br><span class="line"><span class="meta">@SupportedAnnotationTypes</span>(<span class="string">"cn.intotw.*"</span>)</span><br><span class="line"><span class="meta">@SupportedSourceVersion</span>(SourceVersion.RELEASE_8)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ModCloudAnnotationProcessor</span> <span class="keyword">extends</span> <span class="title">AbstractProcessor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Messager messager;</span><br><span class="line">    <span class="keyword">private</span> JavacTrees trees;</span><br><span class="line">    <span class="keyword">private</span> TreeMaker treeMaker;</span><br><span class="line">    <span class="keyword">private</span> Names names;</span><br><span class="line">    Map&lt;String, JCTree.JCAssign&gt; consumerSourceAnnotationValue=<span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    Map&lt;String, JCTree.JCAssign&gt; providerSourceAnnotationValue=<span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    java.util.List&lt;String&gt; javaBaseVarType;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment processingEnv)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//基本构建，主要是初始化一些操作语法树需要的对象</span></span><br><span class="line">        <span class="keyword">super</span>.init(processingEnv);</span><br><span class="line">        <span class="keyword">this</span>.messager = processingEnv.getMessager();</span><br><span class="line">        <span class="keyword">this</span>.trees = JavacTrees.instance(processingEnv);</span><br><span class="line">        Context context = ((JavacProcessingEnvironment) processingEnv).getContext();</span><br><span class="line">        <span class="keyword">this</span>.treeMaker = TreeMaker.instance(context);</span><br><span class="line">        <span class="keyword">this</span>.names = Names.instance(context);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (roundEnv.processingOver()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//获取所有增加了自定义注解的element集合</span></span><br><span class="line">        Set&lt;? extends Element&gt; set = roundEnv.getElementsAnnotatedWith(MobCloudConsumer.class);</span><br><span class="line">        <span class="comment">//遍历这个集合，这个集合的每个element相当于一个拥有自定义注解的需要处理的类。</span></span><br><span class="line">        set.forEach(element -&gt; &#123;</span><br><span class="line">            <span class="comment">//获取语法树</span></span><br><span class="line">            JCTree jcTree=trees.getTree(element);</span><br><span class="line">            printLog(<span class="string">"result :&#123;&#125;"</span>,jcTree);</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>&#160; &#160; &#160; &#160;上面代码中获取的jctree就是那个class文件解析后的java语法树了，下面来看下有哪些操作。</p>
+<h2 id="遍历语法树"><a href="#遍历语法树" class="headerlink" title="遍历语法树"></a>遍历语法树</h2><p>&#160; &#160; &#160; &#160;java语法树的遍历，并不是能像寻常树节点一样提供child之类的节点，而是通过TreeTranslator这个访问类的实现来做到的，这个类的可供实现的方法有很多，可以用来遍历语法树的注解、方法、变量，基本上语法树的所有java元素，都可以使用这个访问器来访问</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取源注解的参数</span></span><br><span class="line">jcTree.accept(<span class="keyword">new</span> TreeTranslator()&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">visitAnnotation</span><span class="params">(JCTree.JCAnnotation jcAnnotation)</span> </span>&#123;</span><br><span class="line">        JCTree.JCIdent jcIdent=(JCTree.JCIdent)jcAnnotation.getAnnotationType();</span><br><span class="line">        <span class="keyword">if</span>(jcIdent.name.contentEquals(<span class="string">"MobCloudConsumer"</span>))&#123;</span><br><span class="line">            printLog(<span class="string">"class Annotation arg process:&#123;&#125;"</span>,jcAnnotation.toString());</span><br><span class="line">            jcAnnotation.args.forEach(e-&gt;&#123;</span><br><span class="line">                JCTree.JCAssign jcAssign=(JCTree.JCAssign)e ;</span><br><span class="line">                JCTree.JCIdent value = treeMaker.Ident(names.fromString(<span class="string">"value"</span>));</span><br><span class="line">                JCTree.JCAssign targetArg=treeMaker.Assign(value,jcAssign.rhs);</span><br><span class="line">                consumerSourceAnnotationValue.put(jcAssign.lhs.toString(),targetArg);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        printLog(<span class="string">"获取参数如下:"</span>,consumerSourceAnnotationValue);</span><br><span class="line">        <span class="keyword">super</span>.visitAnnotation(jcAnnotation);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="语法树中的源节点"><a href="#语法树中的源节点" class="headerlink" title="语法树中的源节点"></a>语法树中的源节点</h2><p>&#160; &#160; &#160; &#160;前面说了语法树是有一个个对象组成的，这些对象构成了语法树的一个个源节点，源节点对应java语法中核心的那些语法：<br>| 语法树节点类 | 具体对应的语法元素 |<br>| — | — |<br>| JCClassDecl | 类的定义 |<br>| JCMethodDecl | 方法的定义 |<br>| JCAssign | 等式（赋值）语句 |<br>| JCExpression | 表达式 |<br>| JCAnnotation | 注解 |<br>| JCVariableDecl | 变量定义 | </p>
+<h2 id="语法树节点的操作"><a href="#语法树节点的操作" class="headerlink" title="语法树节点的操作"></a>语法树节点的操作</h2><p>&#160; &#160; &#160; &#160;既然说了语法树的那些重要节点，后面直接上案例，该如何操作。需要注意的一点是，Java语法树中所有的操作，对于语法树节点，都不能通过引用操作来复制，必须要从头到尾构造一个一模一样的对象并插入，否则编译是过不去的。</p>
+<h3 id="给类增加注解"><a href="#给类增加注解" class="headerlink" title="给类增加注解"></a>给类增加注解</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//该方法最后会给类新增一个@FeignClient(value="")的注解</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addClassAnnotation</span><span class="params">(Element element)</span> </span>&#123;</span><br><span class="line">    JCTree jcTree = trees.getTree(element);</span><br><span class="line">    jcTree.accept(<span class="keyword">new</span> TreeTranslator()&#123;</span><br><span class="line">        <span class="comment">//遍历所有类定义</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">visitClassDef</span><span class="params">(JCTree.JCClassDecl jcClassDecl)</span> </span>&#123;</span><br><span class="line">            JCTree.JCExpression arg;</span><br><span class="line">            <span class="comment">//创建一个value的赋值语句，作为注解的参数</span></span><br><span class="line">            <span class="keyword">if</span>(jcAssigns==<span class="keyword">null</span> || jcAssigns.size()==<span class="number">0</span>)&#123;</span><br><span class="line">                arg=makeArg(<span class="string">"value"</span>,<span class="string">""</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            printLog(<span class="string">"jcAssigns :&#123;&#125;"</span>,jcAssigns);</span><br><span class="line">            <span class="comment">//创建注解对象</span></span><br><span class="line">            JCTree.JCAnnotation jcAnnotation=makeAnnotation(PackageSupportEnum.FeignClient.toString(),List.of(arg));</span><br><span class="line">            printLog(<span class="string">"class Annotation add:&#123;&#125;"</span>,jcAnnotation.toString());</span><br><span class="line">            <span class="comment">//在原有类定义中append新的注解对象</span></span><br><span class="line">            jcClassDecl.mods.annotations=jcClassDecl.mods.annotations.append(jcAnnotation);</span><br><span class="line">            jcClassDecl.mods.annotations.forEach(e -&gt; &#123;</span><br><span class="line">                printLog(<span class="string">"class Annotation list:&#123;&#125;"</span>,e.toString());</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="keyword">super</span>.visitClassDef(jcClassDecl);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> JCTree.<span class="function">JCExpression <span class="title">makeArg</span><span class="params">(String key,String value)</span></span>&#123;</span><br><span class="line">    <span class="comment">//注解需要的参数是表达式，这里的实际实现为等式对象，Ident是值，Literal是value，最后结果为a=b</span></span><br><span class="line">    JCTree.JCExpression arg = treeMaker.Assign(treeMaker.Ident(names.fromString(key)), treeMaker.Literal(value));</span><br><span class="line">    <span class="keyword">return</span> arg;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCAnnotation <span class="title">makeAnnotation</span><span class="params">(String annotaionName, List&lt;JCTree.JCExpression&gt; args)</span></span>&#123;</span><br><span class="line">    JCTree.JCExpression expression=chainDots(annotaionName.split(<span class="string">"\\."</span>));</span><br><span class="line">    JCTree.JCAnnotation jcAnnotation=treeMaker.Annotation(expression, args);</span><br><span class="line">    <span class="keyword">return</span> jcAnnotation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="给类增加import语句"><a href="#给类增加import语句" class="headerlink" title="给类增加import语句"></a>给类增加import语句</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addImport</span><span class="params">(Element element,PackageSupportEnum... packageSupportEnums)</span> </span>&#123;</span><br><span class="line">    TreePath treePath = trees.getPath(element);</span><br><span class="line">    JCTree.JCCompilationUnit jccu = (JCTree.JCCompilationUnit) treePath.getCompilationUnit();</span><br><span class="line">    java.util.List&lt;JCTree&gt; trees = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    trees.addAll(jccu.defs);</span><br><span class="line">    java.util.List&lt;JCTree&gt; sourceImportList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    trees.forEach(e-&gt;&#123;</span><br><span class="line">        <span class="keyword">if</span>(e.getKind().equals(Tree.Kind.IMPORT))&#123;</span><br><span class="line">            sourceImportList.add(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    java.util.List&lt;JCTree.JCImport&gt; needImportList=buildImportList(packageSupportEnums);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; needImportList.size(); i++) &#123;</span><br><span class="line">        <span class="keyword">boolean</span> importExist=<span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; sourceImportList.size(); j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(sourceImportList.get(j).toString().equals(needImportList.get(i).toString()))&#123;</span><br><span class="line">                importExist=<span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(!importExist)&#123;</span><br><span class="line">            trees.add(<span class="number">0</span>,needImportList.get(i));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    printLog(<span class="string">"import trees&#123;&#125;"</span>,trees.toString());</span><br><span class="line">    jccu.defs=List.from(trees);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> java.util.List&lt;JCTree.JCImport&gt; buildImportList(PackageSupportEnum... packageSupportEnums) &#123;</span><br><span class="line">    java.util.List&lt;JCTree.JCImport&gt; targetImportList =<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span>(packageSupportEnums.length&gt;<span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; packageSupportEnums.length; i++) &#123;</span><br><span class="line">            JCTree.JCImport needImport = buildImport(packageSupportEnums[i].getPackageName(),packageSupportEnums[i].getClassName());</span><br><span class="line">            targetImportList.add(needImport);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> targetImportList;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCImport <span class="title">buildImport</span><span class="params">(String packageName, String className)</span> </span>&#123;</span><br><span class="line">    JCTree.JCIdent ident = treeMaker.Ident(names.fromString(packageName));</span><br><span class="line">    JCTree.JCImport jcImport = treeMaker.Import(treeMaker.Select(</span><br><span class="line">            ident, names.fromString(className)), <span class="keyword">false</span>);</span><br><span class="line">    printLog(<span class="string">"add Import:&#123;&#125;"</span>,jcImport.toString());</span><br><span class="line">    <span class="keyword">return</span> jcImport;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建一个内部类"><a href="#构建一个内部类" class="headerlink" title="构建一个内部类"></a>构建一个内部类</h3><p>&#160; &#160; &#160; &#160;这边演示了一个构建内部类的过程，基本就演示了深拷贝一个内部类的过程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCClassDecl <span class="title">buildInnerClass</span><span class="params">(JCTree.JCClassDecl sourceClassDecl, java.util.List&lt;JCTree.JCMethodDecl&gt; methodDecls)</span> </span>&#123;</span><br><span class="line">    java.util.List&lt;JCTree.JCVariableDecl&gt; jcVariableDeclList = buildInnerClassVar(sourceClassDecl);</span><br><span class="line">    String lowerClassName=sourceClassDecl.getSimpleName().toString();</span><br><span class="line">    lowerClassName=lowerClassName.substring(<span class="number">0</span>,<span class="number">1</span>).toLowerCase().concat(lowerClassName.substring(<span class="number">1</span>));</span><br><span class="line">    java.util.List&lt;JCTree.JCMethodDecl&gt; jcMethodDecls = buildInnerClassMethods(methodDecls,</span><br><span class="line">            lowerClassName);</span><br><span class="line">    java.util.List&lt;JCTree&gt; jcTrees=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    jcTrees.addAll(jcVariableDeclList);</span><br><span class="line">    jcTrees.addAll(jcMethodDecls);</span><br><span class="line">    JCTree.JCClassDecl targetClassDecl = treeMaker.ClassDef(</span><br><span class="line">            buildInnerClassAnnotation(),</span><br><span class="line">            names.fromString(sourceClassDecl.name.toString().concat(<span class="string">"InnerController"</span>)),</span><br><span class="line">            List.nil(),</span><br><span class="line">            <span class="keyword">null</span>,</span><br><span class="line">            List.nil(),</span><br><span class="line">            List.from(jcTrees));</span><br><span class="line">    <span class="keyword">return</span> targetClassDecl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> java.util.List&lt;JCTree.JCVariableDecl&gt; buildInnerClassVar(JCTree.JCClassDecl jcClassDecl) &#123;</span><br><span class="line">    String parentClassName=jcClassDecl.getSimpleName().toString();</span><br><span class="line">    printLog(<span class="string">"simpleClassName:&#123;&#125;"</span>,parentClassName);</span><br><span class="line">    java.util.List&lt;JCTree.JCVariableDecl&gt; jcVariableDeclList=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    java.util.List&lt;JCTree.JCAnnotation&gt; jcAnnotations=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    JCTree.JCAnnotation jcAnnotation=makeAnnotation(PackageSupportEnum.Autowired.toString()</span><br><span class="line">            ,List.nil());</span><br><span class="line">    jcAnnotations.add(jcAnnotation);</span><br><span class="line">    JCTree.JCVariableDecl jcVariableDecl = treeMaker.VarDef(treeMaker.Modifiers(<span class="number">1</span>, from(jcAnnotations)),</span><br><span class="line">            names.fromString(parentClassName.substring(<span class="number">0</span>, <span class="number">1</span>).toLowerCase().concat(parentClassName.substring(<span class="number">1</span>))),</span><br><span class="line">            treeMaker.Ident(names.fromString(parentClassName)),</span><br><span class="line">            <span class="keyword">null</span>);</span><br><span class="line">    jcVariableDeclList.add(jcVariableDecl);</span><br><span class="line">    <span class="keyword">return</span> jcVariableDeclList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCModifiers <span class="title">buildInnerClassAnnotation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    JCTree.JCExpression jcAssign=makeArg(<span class="string">"value"</span>,providerSourceAnnotationValue.get(<span class="string">"feignClientPrefix"</span>).rhs.toString().replace(<span class="string">"\""</span>,<span class="string">""</span>));</span><br><span class="line">    JCTree.JCAnnotation jcAnnotation=makeAnnotation(PackageSupportEnum.RequestMapping.toString(),</span><br><span class="line">            List.of(jcAssign)</span><br><span class="line">    );</span><br><span class="line">    JCTree.JCAnnotation restController=makeAnnotation(PackageSupportEnum.RestController.toString(),List.nil());</span><br><span class="line">    JCTree.JCModifiers mods=treeMaker.Modifiers(Flags.PUBLIC|Flags.STATIC,List.of(jcAnnotation).append(restController));</span><br><span class="line">    <span class="keyword">return</span> mods;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//深度拷贝内部类方法</span></span><br><span class="line"><span class="keyword">private</span> java.util.List&lt;JCTree.JCMethodDecl&gt; buildInnerClassMethods(java.util.List&lt;JCTree.JCMethodDecl&gt; methodDecls,String serviceName) &#123;</span><br><span class="line">    java.util.List&lt;JCTree.JCMethodDecl&gt; target = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    methodDecls.forEach(e -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (!e.name.contentEquals(<span class="string">"&lt;init&gt;"</span>)) &#123;</span><br><span class="line">            java.util.List&lt;JCTree.JCVariableDecl&gt; targetParams=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            e.params.forEach(param-&gt;&#123;</span><br><span class="line">                JCTree.JCVariableDecl newParam=treeMaker.VarDef(</span><br><span class="line">                        (JCTree.JCModifiers) param.mods.clone(),</span><br><span class="line">                        param.name,</span><br><span class="line">                        param.vartype,</span><br><span class="line">                        param.init</span><br><span class="line">                );</span><br><span class="line">                printLog(<span class="string">"copy of param:&#123;&#125;"</span>,newParam);</span><br><span class="line">                targetParams.add(newParam);</span><br><span class="line">            &#125;);</span><br><span class="line">            JCTree.JCMethodDecl methodDecl = treeMaker.MethodDef(</span><br><span class="line">                    (JCTree.JCModifiers) e.mods.clone(),</span><br><span class="line">                    e.name,</span><br><span class="line">                    (JCTree.JCExpression) e.restype.clone(),</span><br><span class="line">                    e.typarams,</span><br><span class="line">                    e.recvparam,</span><br><span class="line">                    List.from(targetParams),</span><br><span class="line">                    e.thrown,</span><br><span class="line">                    treeMaker.Block(<span class="number">0L</span>,List.nil()),</span><br><span class="line">                    e.defaultValue</span><br><span class="line">            );</span><br><span class="line">            target.add(methodDecl);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    target.forEach(e -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (e.params.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; e.params.size() ; i++) &#123;</span><br><span class="line">                JCTree.JCVariableDecl jcVariableDecl=e.params.get(i);</span><br><span class="line">                <span class="keyword">if</span>(i==<span class="number">0</span>)&#123;</span><br><span class="line">                    <span class="comment">//第一个参数加requestbody注解，其他参数加requestparam注解，否则会报错</span></span><br><span class="line">                    <span class="keyword">if</span>(!isBaseVarType(jcVariableDecl.vartype.toString()))</span><br><span class="line">                    &#123;</span><br><span class="line">                        jcVariableDecl.mods.annotations = jcVariableDecl.mods.annotations.append(makeAnnotation(PackageSupportEnum.RequestBody.toString(), List.nil()));</span><br><span class="line">                    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                        JCTree.JCAnnotation requestParam=makeAnnotation(PackageSupportEnum.RequestParam.toString(),</span><br><span class="line">                                List.of(makeArg(<span class="string">"value"</span>,jcVariableDecl.name.toString())));</span><br><span class="line">                        jcVariableDecl.mods.annotations = jcVariableDecl.mods.annotations.append(requestParam);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    JCTree.JCAnnotation requestParam=makeAnnotation(PackageSupportEnum.RequestParam.toString(),</span><br><span class="line">                            List.of(makeArg(<span class="string">"value"</span>,jcVariableDecl.name.toString())));</span><br><span class="line">                    jcVariableDecl.mods.annotations = jcVariableDecl.mods.annotations.append(requestParam);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        printLog(<span class="string">"sourceMethods: &#123;&#125;"</span>, e);</span><br><span class="line">        <span class="comment">//value</span></span><br><span class="line">        JCTree.JCExpression jcAssign=makeArg(<span class="string">"value"</span>,<span class="string">"/"</span>+e.name.toString());</span><br><span class="line"></span><br><span class="line">        JCTree.JCAnnotation jcAnnotation = makeAnnotation(</span><br><span class="line">                PackageSupportEnum.PostMapping.toString(),</span><br><span class="line">                List.of(jcAssign)</span><br><span class="line">        );</span><br><span class="line">        printLog(<span class="string">"annotation: &#123;&#125;"</span>, jcAnnotation);</span><br><span class="line">        e.mods.annotations = e.mods.annotations.append(jcAnnotation);</span><br><span class="line">        JCTree.JCExpressionStatement exec = getMethodInvocationStat(serviceName, e.name.toString(), e.params);</span><br><span class="line">        <span class="keyword">if</span>(!e.restype.toString().contains(<span class="string">"void"</span>))&#123;</span><br><span class="line">            JCTree.JCReturn jcReturn=treeMaker.Return(exec.getExpression());</span><br><span class="line">            e.body.stats = e.body.stats.append(jcReturn);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            e.body.stats = e.body.stats.append(exec);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> List.from(target);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//创建方法调用，如String.format()这种</span></span><br><span class="line"><span class="keyword">private</span> JCTree.<span class="function">JCExpressionStatement <span class="title">getMethodInvocationStat</span><span class="params">(String invokeFrom, String invokeMethod, List&lt;JCTree.JCVariableDecl&gt; args)</span> </span>&#123;</span><br><span class="line">    java.util.List&lt;JCTree.JCIdent&gt; params = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    args.forEach(e -&gt; &#123;</span><br><span class="line">        params.add(treeMaker.Ident(e.name));</span><br><span class="line">    &#125;);</span><br><span class="line">    JCTree.JCIdent invocationFrom = treeMaker.Ident(names.fromString(invokeFrom));</span><br><span class="line">    JCTree.JCFieldAccess jcFieldAccess1 = treeMaker.Select(invocationFrom, names.fromString(invokeMethod));</span><br><span class="line">    JCTree.JCMethodInvocation apply = treeMaker.Apply(nil(), jcFieldAccess1, List.from(params));</span><br><span class="line">    JCTree.JCExpressionStatement exec = treeMaker.Exec(apply);</span><br><span class="line">    printLog(<span class="string">"method invoke:&#123;&#125;"</span>, exec);</span><br><span class="line">    <span class="keyword">return</span> exec;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>&#160; &#160; &#160; &#160;注解器的实际使用，需要在resource文件夹下的META-INF.services文件夹下，新建一个叫做javax.annotation.processing.Processor的文件，里面写上需要生效的类注解处理器的包名加类名，例如：cn.intotw.mob.ModCloudAnnotationProcessor。<br>&#160; &#160; &#160; &#160;然后如果是作为第三方jar包提供给别人，需要在maven打包时增加如下配置，主要也是把javax.annotation.processing.Processor文件也打包到对应目录：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">resource</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/**/*<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-resources-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>process-META<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>prepare-package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>copy-resources<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">outputDirectory</span>&gt;</span>target/classes<span class="tag">&lt;/<span class="name">outputDirectory</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">resource</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;basedir&#125;/src/main/resources/<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>&#160; &#160; &#160; &#160;这个技术主要也是以摸索API使用为主，国内没有什么资料，国外的资料也都是语法和类的介绍，实际例子并不多，花了很多时间摸索具体使用的方法，基本能达到实现一切操作了，毕竟注解，方法，类，变量，方法调用，这些都能自定义了，基本也没有什么别的了。期间参考了不少lombok的源码，lombok是在java语法树节点之外利用自己的语法树节点封装了一层，简化和规范了很多操作，可惜我找了一下lombok貌似并没有提供类似于工具包辅助，所以更加深入的使用推荐参考lombok源码的实现。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2020/03/09/Java编译期注解处理器详细使用方法/">Java编译期注解处理器详细使用方法</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">IntoTw</a></p>
+        <p><span>发布时间:</span>2020-03-09, 15:22:36</p>
+        <p><span>最后更新:</span>2020-04-21, 19:52:59</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2020/03/09/Java编译期注解处理器详细使用方法/" title="Java编译期注解处理器详细使用方法">https://github.com/IntoTw/2020/03/09/Java编译期注解处理器详细使用方法/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://github.com/IntoTw/2020/03/09/Java编译期注解处理器详细使用方法/　　作者: IntoTw" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2020/04/01/leetcode刷题记录-1395/">
+                    leetcode刷题录-1395
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2020/01/02/KeepAlive安装以及简单配置/">
+                    KeepAlive安装以及简单配置
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Java编译期注解处理器"><span class="toc-number">1.</span> <span class="toc-text">Java编译期注解处理器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启用注解处理器"><span class="toc-number">2.</span> <span class="toc-text">启用注解处理器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#遍历语法树"><span class="toc-number">3.</span> <span class="toc-text">遍历语法树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#语法树中的源节点"><span class="toc-number">4.</span> <span class="toc-text">语法树中的源节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#语法树节点的操作"><span class="toc-number">5.</span> <span class="toc-text">语法树节点的操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#给类增加注解"><span class="toc-number">5.1.</span> <span class="toc-text">给类增加注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#给类增加import语句"><span class="toc-number">5.2.</span> <span class="toc-text">给类增加import语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#构建一个内部类"><span class="toc-number">5.3.</span> <span class="toc-text">构建一个内部类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用方法"><span class="toc-number">6.</span> <span class="toc-text">使用方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Java编译期注解处理器详细使用方法　| IntoTw' blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2020/04/01/leetcode刷题记录-1395/" title="上一篇: leetcode刷题录-1395">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2020/01/02/KeepAlive安装以及简单配置/" title="下一篇: KeepAlive安装以及简单配置">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/04/21/负载均衡算法/">负载均衡算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/01/leetcode刷题记录-1395/">leetcode刷题录-1395</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/09/Java编译期注解处理器详细使用方法/">Java编译期注解处理器详细使用方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/02/KeepAlive安装以及简单配置/">KeepAlive安装以及简单配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/31/xxl-job较深入使用/">xxl-job较深入使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/31/Spring Boot WebSocket技术/">SpringBoot WebSocket技术</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/03/Spring-Boot-Scheduled定时任务特性/">Spring Boot Scheduled定时任务特性</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/27/不继续使用CSDN的原因/">不继续使用CSDN的原因</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/27/Git使用详解/">Git使用详解</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2020 IntoTw
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
